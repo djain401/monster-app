@@ -1,23 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import React, { useState, useEffect } from "react";
+import SearchBox from "./components/search-bar/search-box.component";
+import CardList from "./components/card-list/card-list.component";
 
 function App() {
+  const [searchField, setSearchField] = useState("");
+
+  const [monsters, setMonsters] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then((response) => response.json())
+      .then((users) => {
+        setLoading(false);
+        setMonsters(users);
+        // setFilterMonsters(users);
+      })
+      .catch((e) => {
+        console.error(`An error occurred: ${e}`);
+      });
+  }, []);
+
+  const onSearchChange = (event) => {
+    setSearchField(event.target.value.toLocaleLowerCase());
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1 className="app-title">Monsters Index</h1>
+      <SearchBox
+        onChangeHandler={onSearchChange}
+        placeHolder="Search Monsters"
+        className="monsters-search-box"
+      />
+
+      <CardList monsters={monsters} searchValue={searchField} />
     </div>
   );
 }
